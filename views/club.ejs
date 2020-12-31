@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="/styles/club.css" />
+    <title>Bookclub lists</title>
+</head>
+<body>
+    <% if (clubName.length > 0) { %>
+        <h1><%=clubName%></h1>
+        <% if (username.length > 0) { %>
+            <p class="username" data-user="<%=username%>">welcome <%=username%>, you can send messages and reccomend books to your club</p>
+            <p class="hidden"><%=username%></p>
+        <% } %>
+        <% if (pin.length > 0) { %>
+            <p>Others can join your club with the pin
+                <span class="sharePin" data-room="<%=pin%>"><%=pin%></span>
+            </p>
+        <% } %>
+    <% } %>
+    <main>
+        <div>
+            <p>chat and votes</p>
+            <div class="chat-container">
+                <% if (chat) { chat.forEach(function(message) { %>
+                    <li id="B<%=message._id%>" class="message">
+                        <p class="message-txt"><%=message.msg%></p>
+                        <span class="time"><%=message.time%></span>
+                    </li>
+                <% })} %>
+            </div>
+            <div class="input-container">
+                <input class="input" type="text" placeholder="send a message" />
+                <button class="send">send</button>
+            </div>
+        </div>
+                
+        <div class="readingWrapper">
+            <p>reading list</p>
+            <div class="readingList">
+                <% if (bookList.length > 0) { bookList.forEach(function(book) { %>
+                    <li>
+                        <img src="<%=book.img%>" alt="<%=book.title%> <%=book.subtitle%>">
+                        <p><%=book.description%></p>
+                        <a href="<%=book.buy%>">You can get the book here!</a>
+                        <div>
+                            <button>up</button>
+                            <button>down</button>
+                        </div>
+                    </li>
+                <% })} %>
+            </div>
+        </div>
+    </main>
+    <div class="search-container">
+        <input class="searchField" type="text" placeholder="find a book" />
+        <button class="searchButton">search</button>
+    </div>
+    <div class="searchContainer">
+
+    </div>
+    <script src="/scripts/api.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/scripts/client-socket.js"></script>
+</body>
+</html>
