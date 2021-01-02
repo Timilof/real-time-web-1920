@@ -26,20 +26,6 @@ const uri = process.env.DB_NAME;
 
 let chatData;
 
-// function checkWhoIsWho(matchdata, name){
-//   const who = {};
-//   if(name == matchdata[0].hisName){
-//     who.img = matchdata[0].herImage;
-//     who.name = matchdata[0].name
-//     who.id = matchdata[0].roomID
-//   }else{
-//     who.img = matchdata[0].hisImage;
-//     who.name = matchdata[0].hisName
-//     who.id = matchdata[0].roomID
-//   }
-//   return who;
-// }
-
 async function GetFromDB(collection, explicit) {
   const client = new mongo.MongoClient(uri, {
     useNewUrlParser: true,
@@ -68,46 +54,63 @@ async function GetFromDB(collection, explicit) {
   }
 }
 
-// async function removeFromDB(room) {
-//   const client = new MongoClient(uri, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true
-//   });
-//   try {
-//     await client.connect();
-//     const db = client.db("dating-base");
-//     const deleteDocument = await db
-//       .collection("matches")
-//       .deleteOne({ roomID: room });
-//     return deleteDocument;
-//   } catch (e) {
-//     console.error(e);
-//   } finally {
-//     await client.close();
-//   }
-// }
+async function removeFromDB(room) {
+  const client = new MongoClient(uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  });
+  try {
+    await client.connect();
+    const db = client.db("rtw");
+    const deleteDocument = await db
+      .collection("clubs")
+      .deleteOne({ roomID: room });
+    return deleteDocument;
+  } catch (e) {
+    console.error(e);
+  } finally {
+    await client.close();
+  }
+}
 
-// async function updateInCollection(nameOfDocument, newValue) {
-//   const client = new MongoClient(uri, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true
-//   });
-//   try {
-//     await client.connect();
-//     const db = client.db("dating-base");
-//     const updatedDocument = await db
-//       .collection("matches")
-//       .updateOne(
-//         { roomID: `${nameOfDocument}` },
-//         { $set: { lastMessage: `${newValue}` } }
-//       );
-//     return updatedDocument;
-//   } catch (e) {
-//     console.error(e);
-//   } finally {
-//     await client.close();
-//   }
-// }
+async function updateInCollection(pin, newValue, explicit) {
+  const client = new MongoClient(uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  });
+  try {
+    await client.connect();
+    const db = client.db("rtw");
+    let updatedDocument;
+      if (explicit == "userlist"){
+        updatedDocument = await db
+        .collection("clubs")
+        .updateOne(
+          { clubPin: `${pin}` },
+          { $set: { userlist: newValue } }
+        );
+     }else if(explicit == "bookList"){
+        updatedDocument = await db
+        .collection("clubs")
+        .updateOne(
+          { clubPin: `${pin}` },
+          { $set: { bookList: `${newValue}` } }
+        );
+     }else{
+      updatedDocument = await db
+      .collection("clubs")
+      .updateOne(
+        { clubPin: `${pin}` },
+        { $set: { date: `${newValue}` } }
+      );
+     }
+    return updatedDocument;
+  } catch (e) {
+    console.error(e);
+  } finally {
+    await client.close();
+  }
+}
 
 // async function createNewCollection(nameOfNewCollection) {
 //   const client = new MongoClient(uri, {
@@ -155,10 +158,35 @@ io.on("connection", function(socket) {
   socket.on("join", async function(data) {
     console.log(`user: ${data.user} just joined the ${data.room} room `)
     socket.join(data.room);
-    io.to(data.room).emit("user joined", chatData);
-    // chatData = await GetFromDB(data.room);
-    // write to db that someone joined / in clubs > userlist
+    io.to(data.room).emit("user joined", data.user);
   });
+
+  // leave handler
+  socket.on("leave", async function(data) {
+    console.log(data.user, "left the club... sad :-(")
+    socket.leave(data.room);
+    io.to(data.room).emit("user left", data.user);
+  });
+
+  // add to attending list
+  socket.on("attend", async function(data) {
+    const club = await GetFromDB("clubs", data.room);
+    if(!club[0].userlist.includes(data.user)){
+      club[0].userlist.push(data.user) 
+      io.to(data.room).emit("user attending", data.user);
+      updateInCollection(data.room, club[0].userlist, "userlist");
+    }else{
+      io.to(data.room).emit("user un-attending", data.user);
+      
+      const indexOfItem = club[0].userlist.indexOf(data.user);
+      if (indexOfItem > -1) {
+        club[0].userlist.splice(indexOfItem, 1);
+      }
+      updateInCollection(data.room, club[0].userlist, "userlist");
+    }
+  });
+
+  // remove from attending list
 
 //   // creates a new collection and writes the text message in it
 //   socket.on("make new chat", async function(data) {
@@ -175,8 +203,6 @@ io.on("connection", function(socket) {
 
   // normal message handler
   socket.on("chat message", function(data) {
-    console.log(data)
-
     io.to(data.room).emit("chat message", {
       from: data.from,
       msg: data.msg,
@@ -184,16 +210,15 @@ io.on("connection", function(socket) {
       room: data.room
     });
     writeDb(`club-${data.room}`, data);
-    // updateInCollection(data.room, data.msg);
   });
 
-  // delete message handler
-  socket.on("leave", function(room) {
-    socket.leave(room);
-    // remove this user from the userlist
-    // socket.leave(room);
-    // removeFromDB(room);
+  // new meeting date handler
+  socket.on("new date", function(data) {
+    io.to(data.room).emit("new date", data.date);
+    updateInCollection(data.room, data.date, "date");
   });
+
+  
   
 });
 
@@ -216,7 +241,7 @@ app.get("/", async (req, res, next) => {
     clubChat = await GetFromDB(`club-${req.body.roomName}`);
     console.log(club);
     if (club[0].clubPin.length > 0){
-      res.render("club.ejs", {clubName: club[0].clubName, username: req.body.username ,pin: club[0].clubPin, bookList: club[0].bookList, users: club[0].userList, chat: clubChat });
+      res.render("club.ejs", {clubName: club[0].clubName, username: req.body.username ,pin: club[0].clubPin, date: club[0].date, bookList: club[0].bookList, users: club[0].userList, chat: clubChat });
     }
     else{
       res.render("index.ejs", {errorMsg: "room pin doesn't exist! pick another one"});

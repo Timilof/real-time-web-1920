@@ -36,11 +36,7 @@ h2{
     transform: scale(0.5, 0.5)
 }
 
-
-
-
-
-input{
+.input{
     background-color: #e6e6e6;
     border-radius: 8px;
     padding: 10px;
@@ -52,11 +48,36 @@ input{
 
 .searchField{
     background-color: #fff;
-    font-size: 30px;
+    font-size: 16px;
+    border: none;
     border-bottom: 2px solid #000;
     border-radius: 0;
     color: #000;
     letter-spacing: 1px;
+    width: 78%;
+    outline: none;
+}
+
+.date{
+    outline: none;
+    border: none;
+    font-size: 16px;
+    padding: 0;
+    margin: 0;
+    color: #46b38e;
+    font-weight: 800;
+    letter-spacing: 1px;
+    max-width: 200px;
+}
+
+.attend{
+    background-color: #fd6726;
+    border: none;
+    outline: none;
+    padding: 4px 6px;
+    border-radius: 4px;
+    color: #fffbf6;
+    font-size: 16px;
 }
 
 .message{
@@ -173,4 +194,12 @@ main{
     font-weight: bold;
     letter-spacing: 2px;
     font-size: 18px;
+}
+
+.from{
+    font-size: 11px;
+    color: #333;
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin: 5px 0 -9px 0;
 }

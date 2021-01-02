@@ -1,61 +1,3 @@
-// const api = {
-//     id: function(){const id = document.URL.substring(document.URL.lastIndexOf('/') + 1)
-//         return id},
-//     detailUrl: 'https://restcountries.eu/rest/v2/capital/',
-//     mainUrl: 'https://restcountries.eu/rest/v2/all',
-//     getData: function(url) {
-//       return new Promise(function(resolve, reject) {
-//         const request = new XMLHttpRequest();
-//         request.open('GET', url, true)
-//         request.onload = () => {
-//           if (request.status >= 200 && request.status < 400) {
-//             const data = api.parse(request);
-//             const slicedData = data.slice(0, 250);
-//             resolve(slicedData);
-//             // slicedData.forEach((countryName) => {
-//             //   api.countries.push(countryName.name);
-//             // })
-//           } else {
-//             reject(request.status);
-//           }
-//         };
-//         request.onerror = () => {
-//           reject(request.status); // error handling
-//         };
-//         request.send();
-//       });
-//     },
-//     parse: function(request) {
-//       return JSON.parse(request.responseText);
-//     }
-//   }
-
-//   function getData(url) {
-//     return new Promise(function(resolve, reject) {
-//       const request = new XMLHttpRequest();
-//       request.open('GET', url, true)
-//       request.onload = () => {
-//         if (request.status >= 200 && request.status < 400) {
-//           const data = api.parse(request);
-//           const slicedData = data.slice(0, 50);
-//           resolve(slicedData);
-//           // slicedData.forEach((countryName) => {
-//           //   api.countries.push(countryName.name);
-//           // })
-//         } else {
-//           reject(request.status);
-//         }
-//       };
-//       request.onerror = () => {
-//         reject(request.status); // error handling
-//       };
-//       request.send();
-//     });
-//   }
-//   function parse(request) {
-//     return JSON.parse(request.responseText);
-//   }
-
 // let lastKeyTime = Date.now();
 // if (currentTime - lastKeyTime > 1000) {
 //   horsey = [];
@@ -75,7 +17,7 @@ function buildBooks(data){
         ${data.volumeInfo.imageLinks ? `<img src="${data.volumeInfo.imageLinks.thumbnail}" alt="${data.volumeInfo.title}">` : `<img src="https://i.stack.imgur.com/y9DpT.jpg" alt="${data.volumeInfo.title}">`}
         ${data.volumeInfo.title ? `<p>${data.volumeInfo.title}</p>` : ""}
         ${data.volumeInfo.subtitle ? `<p>${data.volumeInfo.subtitle}</p>` : ""}
-        ${data.volumeInfo.authors[0] ? `<p>${data.volumeInfo.authors[0]}</p>` : ""}
+        ${data.volumeInfo.authors ? `<p>${data.volumeInfo.authors[0]}</p>` : ""}
         ${data.volumeInfo.description ? `<p>${data.volumeInfo.description}</p>` : ""}
         ${data.volumeInfo.publishedDate ? `<p>${data.volumeInfo.publishedDate}</p>` : ""}
         ${data.saleInfo.listPrice ? `<p>${data.saleInfo.listPrice.amount}</p>` : ""}
@@ -84,9 +26,7 @@ function buildBooks(data){
   `
   searchContainer.insertAdjacentHTML('beforeend', book)
 }
-{/* <p>${data.volumeInfo.authors[0] !== "undefined" ? data.volumeInfo.authors[0] : "-"}</p>
-        <p>${data.saleInfo.listPrice.amount !== "undefined" ? data.saleInfo.listPrice.amount : "This book can't be purchased through the Play store"}</p> */}
-{/* <p>${data.volumeInfo.categories[0]}</p> */}
+
   function dataFetch(typeUrl) {
     fetch(typeUrl)
       .then(function(data) {

@@ -20,12 +20,29 @@
             </p>
         <% } %>
     <% } %>
+    <p>Attending: </p>
+    <ul class="attendees">
+        <% if (users) { users.forEach(function(user) { %>
+                <li class="attendee" id="u<%=user%>"><%=user%></li>
+        <% })} %>
+    </ul>
+    <a class="leave" href="/">leave club</a>
+    <p>Our next meeting will be on </p>
+    
+    <input class="date" type="text" value="<%=date%>">
+    <button class="attend">attend meeting</button>
     <main>
         <div>
             <p>chat and votes</p>
             <div class="chat-container">
                 <% if (chat) { chat.forEach(function(message) { %>
-                    <li id="B<%=message._id%>" class="message">
+                    <% if(message.from == username){ %>
+                        <li id="B<%=message._id%>" class="my-message">
+                     <% } %>
+                     <% if (message.from !== username) { %>
+                        <span class="from"><%=message.from%>:</span>
+                        <li id="B<%=message._id%>" class="message">
+                      <% } %>
                         <p class="message-txt"><%=message.msg%></p>
                         <span class="time"><%=message.time%></span>
                     </li>

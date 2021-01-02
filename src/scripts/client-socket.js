@@ -16,21 +16,16 @@ function enableScript() {
 
 if (enableScript()) {
   // the rest of all javascript functionalities here...
-  // if the browser doesn't support these features the user can use the application without javascript
+  // if the browser doesn't support these features the user can use the application without javascript... sad but whatever haha
 
 (function() {
   var socket = io();
 
-  const usernameField = document.querySelector(".username");
-  
-  const chatArea = document.querySelector(".chat-area");
+  const attendeeBox = document.querySelector(".attendees");
+  const date = document.querySelector(".date");
   const chatWindow = document.querySelector(".chat-container");
-
   const sendButton = document.querySelector(".send");
-  // const searchButton = document.querySelector(".searchButton");
-
   const inputField = document.querySelector(".input");
-  // const searchField = document.querySelector(".searchField");
 
   let userName = document.querySelector(".username").dataset.user;
   let roomId = document.querySelector(".sharePin").dataset.room;
@@ -38,21 +33,13 @@ if (enableScript()) {
   function scrollToEnd() {
     chatWindow.scrollTop = chatWindow.scrollHeight;
   }
-
+  
   function buildAMessage(from, messageContent, timestamp) {
     let setToSide;
-    from == userName ? (setToSide = "my-message") : (setToSide = "");
-    let aMessage = `<li class="message ${setToSide}"><p class="message-txt">${messageContent}</p><span class="time">${timestamp}</span></li>`;
+    from == userName ? (setToSide = `<li class="message my-message"`) : (setToSide = `<span class="from">${from}:</span> <li class="message"`);
+    let aMessage = `${setToSide}"><p class="message-txt">${messageContent}</p><span class="time">${timestamp}</span></li>`;
     return aMessage;
   }
-
-  // function updateLastMessages(lastMessage, room) {
-  //   chatLinks.forEach(chatLink => {
-  //     if (chatLink.dataset.room == room) {
-  //       chatLink.querySelector(".last-message").textContent = lastMessage;
-  //     }
-  //   });
-  // }
 
   (function(){
       socket.emit("join", {room: roomId, user: userName});
@@ -77,11 +64,48 @@ if (enableScript()) {
     chatWindow.insertAdjacentHTML("beforeend", sendMessagePrompt);
   }
 
-  // location.reload();
 
-  function leaveRoom(){
-    socket.emit("unmatch", roomId);
-  }
+  document.querySelector(".leave").addEventListener("click", e =>{
+    e.preventDefault();
+    socket.emit("leave", {user: userName, room: roomId})
+    location.href = "/"
+  })
+
+  socket.on("user left", function(data){
+    console.log(data)
+  })
+
+  document.querySelector(".attend").addEventListener("click", e =>{
+    e.preventDefault();
+    socket.emit("attend", {user: userName, room: roomId})
+  })
+
+  socket.on("user attending", function(user){
+      let attenders = `<p class="attendee" id="u${user}">${user}</p>`;
+      attendeeBox.insertAdjacentHTML("beforeend", attenders)
+  });
+  
+  socket.on("user un-attending", function(user){
+      let deleteUser = attendeeBox.querySelector(`#u${user}`);
+      deleteUser.remove();
+  });
+ 
+  document.querySelector(".date").addEventListener("keydown", e=>{
+    let keystoppedTimer = null;
+    clearTimeout(keystoppedTimer);
+    keystoppedTimer = setTimeout(function() {
+      socket.emit("new date", {room: roomId, date: e.target.value})
+    }, 600);
+  })
+
+  socket.on("new date", function(newDate){
+    date.value= newDate
+  })
+
+  
+
+
+
 
   socket.on("open chat", function(data) {
     chatWindow.innerHTML = "";
@@ -97,13 +121,9 @@ if (enableScript()) {
   });
 
   socket.on("chat message", function(data) {
-    // if (isNewMatch) {
-    //   chatWindow.innerHTML = "";
-    // }
     const messageToRender = buildAMessage(data.from, data.msg, data.time);
     chatWindow.insertAdjacentHTML("beforeend", messageToRender);
     scrollToEnd();
-    // updateLastMessages(data.msg, data.room);
   });
 
   sendButton.addEventListener("click", function(e) {
@@ -118,44 +138,20 @@ if (enableScript()) {
     }
   });
 
-  // searchButton.addEventListener("click", function(e) {
-  //   e.preventDefault();
-  //   // searchGoogleBook();
-  // });
-  
-  // searchField.addEventListener("keydown", function(e) {
-  //   if (e.key == "Enter") {
-  //     e.preventDefault();
-  //     // searchGoogleBook();
-  //   }
-  // });
-
   function sendMessage() {
     const message = inputField.value;
-    console.log(message)
     if (message.length < 1) {
       clearInputfieldAndFocus();
       return;
     }
 
     const timestamp = getCurrentTime();
-    // if (isNewMatch) {
-    //   isNewMatch = "reload";
-    //   socket.emit("make new chat", {
-    //     from: userName,
-    //     msg: message,
-    //     time: timestamp,
-    //     room: roomId
-    //   });
-    // }
-    //  else {
       socket.emit("chat message", {
         from: userName,
         msg: message,
         room: roomId,
         time: timestamp,
       });
-    // }
     clearInputfieldAndFocus();
   }
 
