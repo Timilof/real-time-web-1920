@@ -58,11 +58,11 @@ if (enableScript()) {
     return timestamp;
   }
 
-  function renderMessagePrompt() {
-    const sendMessagePrompt = `<li class="prompt"><p>Send a message and she might actually reply</p></li>`;
-    chatWindow.innerHTML = "";
-    chatWindow.insertAdjacentHTML("beforeend", sendMessagePrompt);
-  }
+  // function renderMessagePrompt() {
+  //   const sendMessagePrompt = `<li class="prompt"><p>Send a message and she might actually reply</p></li>`;
+  //   chatWindow.innerHTML = "";
+  //   chatWindow.insertAdjacentHTML("beforeend", sendMessagePrompt);
+  // }
 
 
   document.querySelector(".leave").addEventListener("click", e =>{
@@ -81,7 +81,7 @@ if (enableScript()) {
   })
 
   socket.on("user attending", function(user){
-      let attenders = `<p class="attendee" id="u${user}">${user}</p>`;
+      let attenders = `<li class="attendee" id="u${user}">${user}</li>`;
       attendeeBox.insertAdjacentHTML("beforeend", attenders)
   });
   

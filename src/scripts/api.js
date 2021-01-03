@@ -13,16 +13,22 @@ let staticUrl = "https://www.googleapis.com/books/v1/volumes?q=";
 function buildBooks(data){
   console.log(data.volumeInfo.title)
   let book = `
-    <div>
-        ${data.volumeInfo.imageLinks ? `<img src="${data.volumeInfo.imageLinks.thumbnail}" alt="${data.volumeInfo.title}">` : `<img src="https://i.stack.imgur.com/y9DpT.jpg" alt="${data.volumeInfo.title}">`}
-        ${data.volumeInfo.title ? `<p>${data.volumeInfo.title}</p>` : ""}
-        ${data.volumeInfo.subtitle ? `<p>${data.volumeInfo.subtitle}</p>` : ""}
-        ${data.volumeInfo.authors ? `<p>${data.volumeInfo.authors[0]}</p>` : ""}
-        ${data.volumeInfo.description ? `<p>${data.volumeInfo.description}</p>` : ""}
-        ${data.volumeInfo.publishedDate ? `<p>${data.volumeInfo.publishedDate}</p>` : ""}
-        ${data.saleInfo.listPrice ? `<p>${data.saleInfo.listPrice.amount}</p>` : ""}
-        ${data.saleInfo.buyLink ? `<a target="_blank" href="${data.saleInfo.buyLink}">You can get the book here!</a>` : "Book cant be purchased through the playstore :-("}
-      </div>
+    <div class="book-result">
+        <div class="premium-book-data">
+            ${data.volumeInfo.imageLinks ? `<img class="book-cover" src="${data.volumeInfo.imageLinks.thumbnail}" alt="${data.volumeInfo.title}">` : `<img src="https://i.stack.imgur.com/y9DpT.jpg" alt="${data.volumeInfo.title}">`}
+            ${data.volumeInfo.title ? `<p>${data.volumeInfo.title}</p>` : ""}
+            ${data.volumeInfo.subtitle ? `<p class="small">${data.volumeInfo.subtitle}</p>` : ""}
+            ${data.volumeInfo.authors ? `<p>by ${data.volumeInfo.authors[0]}</p>` : ""}
+        </div>
+        <div class="descriptionContainer">
+            ${data.volumeInfo.description ? `<p>${data.volumeInfo.description}</p>` : ""}
+            ${data.volumeInfo.publishedDate ? `<p class="small">published in ${data.volumeInfo.publishedDate}</p>` : ""}
+        </div>
+        <div class="priceContainer">
+            ${data.saleInfo.listPrice ? `<p class="book-price">€${data.saleInfo.listPrice.amount}</p>` : ""}
+            ${data.saleInfo.buyLink ? `<a class="buy-link" target="_blank" href="${data.saleInfo.buyLink}">Buy</a>` : `<p class="buy-link inactive">Unnavailable</p>`}
+        </div>
+    </div>
   `
   searchContainer.insertAdjacentHTML('beforeend', book)
 }

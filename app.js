@@ -26,6 +26,16 @@ const uri = process.env.DB_NAME;
 
 let chatData;
 
+function makeid() {
+  let result           = '';
+  let characters       = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let charactersLength = characters.length;
+  for ( let i = 0; i < 5; i++ ) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
+
 async function GetFromDB(collection, explicit) {
   const client = new mongo.MongoClient(uri, {
     useNewUrlParser: true,
@@ -96,6 +106,13 @@ async function updateInCollection(pin, newValue, explicit) {
           { clubPin: `${pin}` },
           { $set: { bookList: `${newValue}` } }
         );
+     }else if(explicit == "clubName"){
+        updatedDocument = await db
+        .collection("clubs")
+        .updateOne(
+          { clubPin: `${pin}` },
+          { $set: { clubName: `${newValue}` } }
+        );
      }else{
       updatedDocument = await db
       .collection("clubs")
@@ -112,39 +129,48 @@ async function updateInCollection(pin, newValue, explicit) {
   }
 }
 
-// async function createNewCollection(nameOfNewCollection) {
-//   const client = new MongoClient(uri, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true
-//   });
-
-//   try {
-//     await client.connect();
-//     const db = client.db("dating-base");
-//     const newCollection = await db.createCollection(`${nameOfNewCollection}`);
-//   } catch (e) {
-//     console.error(e);
-//   } finally {
-//     await client.close();
-//   }
-// }
-
-// createNewCollection('match-Claudia-Janno-5e6fcac84d32897c95566666');
-
-async function writeDb(collection, data) {
+async function createNewCollection(nameOfNewCollection) {
   const client = new MongoClient(uri, {
     useNewUrlParser: true,
     useUnifiedTopology: true
   });
-
   try {
     await client.connect();
     const db = client.db("rtw");
-    const fullDump = await db.collection(`${collection}`).insertOne({
-      from: data.from,
-      msg: data.msg,
-      time: data.time
-    });
+    // const newCollection = await db.createCollection(`club-${nameOfNewCollection}`);
+    await db.createCollection(`club-${nameOfNewCollection}`);
+  } catch (e) {
+    console.error(e);
+  } finally {
+    await client.close();
+  }
+}
+
+async function writeDb(collection, data, inclub) {
+  const client = new MongoClient(uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  });
+  let fullDump
+  try {
+    await client.connect();
+    const db = client.db("rtw");
+    if(inclub == "to clubs"){
+      fullDump = await db.collection(`${collection}`).insertOne({
+        userlist: [],
+        bookList: [],
+        clubPin:data.pin,
+        clubName: data.clubName,
+        date: data.date,
+        host: data.host
+      });
+    }else{
+        fullDump = await db.collection(`${collection}`).insertOne({
+          from: data.from,
+          msg: data.msg,
+          time: data.time
+        });
+    }
     return fullDump;
   } catch (e) {
     console.error(e);
@@ -176,9 +202,9 @@ io.on("connection", function(socket) {
       io.to(data.room).emit("user attending", data.user);
       updateInCollection(data.room, club[0].userlist, "userlist");
     }else{
-      io.to(data.room).emit("user un-attending", data.user);
-      
+      // todo idl what is happening here
       const indexOfItem = club[0].userlist.indexOf(data.user);
+      io.to(data.room).emit("user un-attending", data.user);
       if (indexOfItem > -1) {
         club[0].userlist.splice(indexOfItem, 1);
       }
@@ -189,17 +215,17 @@ io.on("connection", function(socket) {
   // remove from attending list
 
 //   // creates a new collection and writes the text message in it
-//   socket.on("make new chat", async function(data) {
-//     chatData = await createNewCollection(data.room);
-//     writeDb(data, data.room);
-//     updateInCollection(data.room, data.msg);
-//     io.to(data.room).emit("chat message", {
-//       from: data.from,
-//       msg: data.msg,
-//       time: data.time,
-//       room: data.room
-//     });
-//   });
+  // socket.on("make new chat", async function(data) {
+  //   chatData = await createNewCollection(data.room);
+  //   writeDb(data, data.room);
+  //   updateInCollection(data.room, data.msg);
+  //   io.to(data.room).emit("chat message", {
+  //     from: data.from,
+  //     msg: data.msg,
+  //     time: data.time,
+  //     room: data.room
+  //   });
+  // });
 
   // normal message handler
   socket.on("chat message", function(data) {
@@ -212,60 +238,70 @@ io.on("connection", function(socket) {
     writeDb(`club-${data.room}`, data);
   });
 
-  // new meeting date handler
+  // new meeting-date handler
   socket.on("new date", function(data) {
     io.to(data.room).emit("new date", data.date);
     updateInCollection(data.room, data.date, "date");
   });
-
-  
   
 });
 
 app.set("view engine", "ejs");
-app.get("/", async (req, res, next) => {
 
-  // if(!req.session.user) {
-  //   req.session.user = 'Janno';
-  // }
-  
-  // const matches = await GetFromDB("matches");
-  // const newMatches = matches.filter(match => match.lastMessage == "");
-  // const oldMatches = matches.filter(match => match.lastMessage !== "");
-  // res.render("chat.ejs", { oldMatches: oldMatches, newMatches: newMatches, user: req.session.user });
+app.get("/", async (req, res) => {
   res.render("index.ejs", {errorMsg: ""});
 });
 
   app.post('/', async function(req, res) {
-    club = await GetFromDB("clubs" ,req.body.roomName);
-    clubChat = await GetFromDB(`club-${req.body.roomName}`);
+    let cleanPin = req.body.roomName.toLowerCase()
+    club = await GetFromDB("clubs" ,cleanPin);
+    clubChat = await GetFromDB(`club-${cleanPin}`);
     console.log(club);
-    if (club[0].clubPin.length > 0){
-      res.render("club.ejs", {clubName: club[0].clubName, username: req.body.username ,pin: club[0].clubPin, date: club[0].date, bookList: club[0].bookList, users: club[0].userList, chat: clubChat });
+    if (club[0]){
+      res.render("club.ejs", {clubName: club[0].clubName, username: req.body.username ,pin: club[0].clubPin, date: club[0].date, bookList: club[0].bookList, users: club[0].userlist, chat: clubChat });
     }
     else{
       res.render("index.ejs", {errorMsg: "room pin doesn't exist! pick another one"});
     }
   })
-  
-  app.get('/chat/:match', async function(req,res){
-    chatData = await GetFromDB(req.params.match);
-    matchData = await GetFromDB("matches", req.params.match);
-    const partnerData = checkWhoIsWho(matchData, req.session.user);
-    res.render("chat-detail.ejs", {messages: chatData, user:req.session.user, partner: partnerData} );
+
+  // create new club room and fill it in 
+  app.post('/create-new', async function(req, res) {
+      let clubPin = makeid()
+      const check = await GetFromDB(`club-${clubPin}`)
+      if(check.length == 0){
+        await createNewCollection(clubPin);
+      }else{
+        // we should be using a callback to check if the id has already been used and if it has then generate a new one
+        clubPin = makeid();
+        await createNewCollection(clubPin);
+      }
+      await writeDb(
+				"clubs",
+				{
+          clubName: req.body.clubName,
+					host: req.body.username,
+					date: `${req.body.date ? req.body.date : "set date here"}`,
+					pin: clubPin
+				},
+				"to clubs"
+      )
+      club = await GetFromDB("clubs" ,clubPin);
+      clubChat = await GetFromDB(`club-${clubPin}`);
+      res.render("club.ejs", {
+				clubName: club[0].clubName,
+				username: req.body.username,
+				pin: club[0].clubPin,
+				date: club[0].date,
+				bookList: club[0].bookList,
+				users: club[0].userlist,
+				chat: clubChat
+			});
   })
   
-  app.get('/unmatch/:id', async function(req,res){
-    await removeFromDB(room)
-    .then(async () => {
-      if(!req.session.user) {
-        req.session.user = 'Janno';
-      }
-      const matches = await GetFromDB("matches");
-      const newMatches = matches.filter(match => match.lastMessage == "");
-      const oldMatches = matches.filter(match => match.lastMessage !== "");
-      res.render("chat.ejs", { oldMatches: oldMatches, newMatches: newMatches, user: req.session.user });
-    })
+ 
+  app.get('/new-room', async function(req,res){
+      res.render("create.ejs");
   })
   
   app.post('/chat/:match', async function(req,res){
@@ -287,24 +323,6 @@ app.get("/", async (req, res, next) => {
     });
   });
 
-  // app.post('/', async function(req, res) {
-  //   const username = req.body.username;
-  //   req.session.user = username;
-  //   const matches = await GetFromDB("matches");
-  //   const newMatches = matches.filter(match => match.lastMessage == "");
-  //   const oldMatches = matches.filter(match => match.lastMessage !== "");
-  //   res.render("chat.ejs", { oldMatches: oldMatches, newMatches: newMatches, user: req.session.user });
-  // });
-
 http.listen(process.env.PORT || port, () =>
   console.log(`Realtime app on ${port}!`)
 );
-
-
-// {
-//   "userlist": [],
-//   "bookList": [] ,
-// "roomId":"",
-// "clubPin":"",
-// "clubName":""
-// }

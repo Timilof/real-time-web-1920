@@ -70,6 +70,15 @@ h2{
     max-width: 200px;
 }
 
+.username{
+    text-align: center;
+    margin: 10px 0 0 0;
+}
+
+.info{
+    text-align: center;
+}
+
 .attend{
     background-color: #fd6726;
     border: none;
@@ -202,4 +211,84 @@ main{
     font-weight: bold;
     letter-spacing: 1px;
     margin: 5px 0 -9px 0;
+}
+
+.searchContainer{
+    margin: 0 150px 50px;
+    max-height: 400px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    padding: 20px 0 0 0;
+}
+
+.book-cover{
+    box-shadow: 0px 4px 7px 12px rgba( 255,255,255,0.4 ), 0px 4px 16px rgb(0 0 0 / 66%);
+
+}
+
+.small{
+    font-size: 12px;
+}
+
+.premium-book-data{
+    padding: 30px;
+    max-width: 20%;
+}
+
+.book-result{
+    display: flex;
+    position: relative;
+    margin: 20px 0;
+}
+
+.descriptionContainer{
+    margin: 30px 30px 0 0;
+    max-width: 80%;
+    width: 80%;
+}
+
+.buy-link{
+    background: #7ec8ff;
+    border-radius: 4px;
+    color: #174B87;
+    font-weight: 500;
+    text-decoration: none;
+    text-align: right;
+    padding: 2px 6px 2px 30px;
+    height: fit-content;
+    margin: 0 14px;
+    position: relative;
+}
+
+.buy-link::before{
+    content: "";
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    background-image: url("https://assets.stickpng.com/images/5847f9cbcef1014c0b5e48c8.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.book-price{
+    text-decoration: underline;
+    text-align: center;
+    border-radius: 4px;
+    display: inline;
+}
+
+.inactive{
+    color:#333;
+    background-color: #eee;
+}
+
+.priceContainer{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    margin: 0;
+    padding: 0;
+    align-items: center;
 }

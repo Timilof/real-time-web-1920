@@ -8,29 +8,31 @@
     <title>Bookclub lists</title>
 </head>
 <body>
-    <% if (clubName.length > 0) { %>
-        <h1><%=clubName%></h1>
-        <% if (username.length > 0) { %>
-            <p class="username" data-user="<%=username%>">welcome <%=username%>, you can send messages and reccomend books to your club</p>
-            <p class="hidden"><%=username%></p>
+    <div>
+        <% if (clubName.length > 0) { %>
+            <% if (username.length > 0) { %>
+                <p class="username" data-user="<%=username%>">welcome <%=username%>, you can send messages and reccomend books to your club</p>
+            <% } %>
+            <% if (pin.length > 0) { %>
+                <p class="info">Others can join your club with the pin
+                    <span class="sharePin" data-room="<%=pin%>"><%=pin%></span>
+                </p>
+            <% } %>
+            <h1><%=clubName%></h1>
         <% } %>
-        <% if (pin.length > 0) { %>
-            <p>Others can join your club with the pin
-                <span class="sharePin" data-room="<%=pin%>"><%=pin%></span>
-            </p>
-        <% } %>
-    <% } %>
-    <p>Attending: </p>
-    <ul class="attendees">
-        <% if (users) { users.forEach(function(user) { %>
-                <li class="attendee" id="u<%=user%>"><%=user%></li>
-        <% })} %>
-    </ul>
+        <p>Attending: </p>
+        <ul class="attendees">
+            <% if (users) { users.forEach(function(user) { %>
+                    <li class="attendee" id="u<%=user%>"><%=user%></li>
+            <% })} %>
+        </ul>
+    </div>
     <a class="leave" href="/">leave club</a>
-    <p>Our next meeting will be on </p>
-    
-    <input class="date" type="text" value="<%=date%>">
-    <button class="attend">attend meeting</button>
+    <div>
+        <p>Our next meeting will be on </p>
+        <input class="date" type="text" value="<%=date%>">
+        <button class="attend">attend meeting</button>
+    </div>
     <main>
         <div>
             <p>chat and votes</p>
