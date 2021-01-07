@@ -104,7 +104,7 @@ async function updateInCollection(pin, newValue, explicit) {
         .collection("clubs")
         .updateOne(
           { clubPin: `${pin}` },
-          { $set: { bookList: `${newValue}` } }
+          { $set: { bookList: newValue } }
         );
      }else if(explicit == "clubName"){
         updatedDocument = await db
@@ -168,7 +168,8 @@ async function writeDb(collection, data, inclub) {
         fullDump = await db.collection(`${collection}`).insertOne({
           from: data.from,
           msg: data.msg,
-          time: data.time
+          time: data.time,
+          // id: data.id
         });
     }
     return fullDump;
@@ -212,33 +213,45 @@ io.on("connection", function(socket) {
     }
   });
 
-  // remove from attending list
-
-//   // creates a new collection and writes the text message in it
-  // socket.on("make new chat", async function(data) {
-  //   chatData = await createNewCollection(data.room);
-  //   writeDb(data, data.room);
-  //   updateInCollection(data.room, data.msg);
-  //   io.to(data.room).emit("chat message", {
-  //     from: data.from,
-  //     msg: data.msg,
-  //     time: data.time,
-  //     room: data.room
-  //   });
-  // });
-
   // normal message handler
   socket.on("chat message", function(data) {
     io.to(data.room).emit("chat message", {
       from: data.from,
       msg: data.msg,
       time: data.time,
-      room: data.room
+      room: data.room,
+      bookId: data.bookid
     });
     writeDb(`club-${data.room}`, data);
   });
 
-  // new meeting-date handler
+  // add book to bookList
+  socket.on("add book", async function(data) {
+    const reccomended = {
+      name: data.book.title, id: data.book.bookid, pic: data.book.cover, author: data.book.author, votes:[], reccomendedBy:data.from
+    }
+    const booksArray = [];
+    const club = await GetFromDB("clubs", data.room);
+    let result = club[0].bookList.find(obj => {
+      return obj.id === data.book.bookid
+    })
+    if(!result || result == undefined){
+      // booksArray.push("reccomended");
+      // const newbooksArray = club[0].bookList.concat(booksArray)
+      // console.log(typeof booksArray, booksArray, "coming from booksarray");
+      club[0].bookList.push({name: data.book.title, id: data.book.bookid, pic: data.book.cover, author: data.book.author, votes:[], reccomendedBy:data.from});
+      console.log(club[0].bookList," coming from booklist");
+      io.to(data.room).emit("add to reading list", {
+        from: data.from,
+        book: reccomended
+      });
+      updateInCollection(data.room, club[0].bookList, "bookList");
+    }else{
+      console.log(data.book.title, " is already in the booklist")
+  };
+})
+
+  // new meeting-date-time handler
   socket.on("new date", function(data) {
     io.to(data.room).emit("new date", data.date);
     updateInCollection(data.room, data.date, "date");
@@ -258,7 +271,15 @@ app.get("/", async (req, res) => {
     clubChat = await GetFromDB(`club-${cleanPin}`);
     console.log(club);
     if (club[0]){
-      res.render("club.ejs", {clubName: club[0].clubName, username: req.body.username ,pin: club[0].clubPin, date: club[0].date, bookList: club[0].bookList, users: club[0].userlist, chat: clubChat });
+      res.render("club.ejs", {
+				clubName: club[0].clubName,
+				username: req.body.username,
+				pin: club[0].clubPin,
+				date: club[0].date,
+				bookList: club[0].bookList,
+				users: club[0].userlist,
+				chat: clubChat
+			});
     }
     else{
       res.render("index.ejs", {errorMsg: "room pin doesn't exist! pick another one"});
@@ -272,7 +293,7 @@ app.get("/", async (req, res) => {
       if(check.length == 0){
         await createNewCollection(clubPin);
       }else{
-        // we should be using a callback to check if the id has already been used and if it has then generate a new one
+        // we should be using a callback to check if the id has already been used and if it has then generate a new one... but im gonna do a quick and dirty thing here so yea.. sorry
         clubPin = makeid();
         await createNewCollection(clubPin);
       }

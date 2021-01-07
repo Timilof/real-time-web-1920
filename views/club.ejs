@@ -11,7 +11,7 @@
     <div>
         <% if (clubName.length > 0) { %>
             <% if (username.length > 0) { %>
-                <p class="username" data-user="<%=username%>">welcome <%=username%>, you can send messages and reccomend books to your club</p>
+                <span class="username" data-user="<%=username%>">welcome <%=username%>, you can send messages and reccomend books to your club</span>
             <% } %>
             <% if (pin.length > 0) { %>
                 <p class="info">Others can join your club with the pin
@@ -45,7 +45,25 @@
                         <span class="from"><%=message.from%>:</span>
                         <li id="B<%=message._id%>" class="message">
                       <% } %>
-                        <p class="message-txt"><%=message.msg%></p>
+                      <% if (message.msg.title) { %>
+                        <div class="message-book message-txt">
+                            <button class="add">add to reading list</button>
+                            <button id="<%=message.msg.bookid%>" class="add" data-bookid="<%=message.msg.bookid%>" data-title="<%=message.msg.title%>" data-subtitle="<%=message.msg.subtitle%>" data-cover="<%=message.msg.cover%>" data-description="<%=message.msg.description%>" data-author="<%=message.msg.author%>" data-price="<%=message.msg.price%>" >add to reading list</button>
+                            <div class="message-details">
+
+                                <img class="message-img" src="<%=message.msg.cover%>">
+                                <p><%=message.msg.title%></p>
+                                <p><%=message.msg.subtitle%></p>
+                                <p class="small"><%=message.msg.author%></p>
+                            </div>
+                            <div class="message-description">
+                                <p class="desc"><%=message.msg.description%></p>
+                                <!-- <p class="small"><%=message.msg.price%></p> -->
+                            </div>
+                        </div>
+                      <% } else { %>
+                            <p class="message-txt"><%=message.msg%></p>
+                      <% } %>
                         <span class="time"><%=message.time%></span>
                     </li>
                 <% })} %>
@@ -59,15 +77,19 @@
         <div class="readingWrapper">
             <p>reading list</p>
             <div class="readingList">
-                <% if (bookList.length > 0) { bookList.forEach(function(book) { %>
-                    <li>
-                        <img src="<%=book.img%>" alt="<%=book.title%> <%=book.subtitle%>">
-                        <p><%=book.description%></p>
-                        <a href="<%=book.buy%>">You can get the book here!</a>
-                        <div>
-                            <button>up</button>
-                            <button>down</button>
+                <% if (bookList) { bookList.forEach(function(book) { %>
+                    <li class="reccomended-book">
+                        <p class="tiny bold recco"><%=book.reccomendedBy%> reccomend:</p>
+                        <div class="book-img-container">
+                            <img src="<%=book.pic%>" alt="<%=book.title%> <%=book.subtitle%>">
+                            
+                            <button class="like-button">
+                                <!-- <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="heart" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-heart fa-w-16 fa-7x"><path fill="currentColor" d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z" class="heart"></path></svg> -->
+                                <span><%=book.votes.length%> likes</span>
+                            </button>
                         </div>
+                        <p><%=book.name%></p>
+                        <p class="small"><%=book.author%></p>
                     </li>
                 <% })} %>
             </div>

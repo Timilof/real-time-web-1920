@@ -1,24 +1,5 @@
-function featureCheck(feature, where, type) {
-  return feature in where
-      && type ?
-          typeof where[feature] === type
-          : true
-}
 
 
-function enableScript() {
-  return featureCheck('classList', document.body)
-      && featureCheck('Array', Array.prototype, 'function')
-      && featureCheck('querySelectorAll', document.body, 'function')
-      && featureCheck('getElementById', document.body)
-      && featureCheck('forEach', document.body, 'function')
-}
-
-if (enableScript()) {
-  // the rest of all javascript functionalities here...
-  // if the browser doesn't support these features the user can use the application without javascript... sad but whatever haha
-
-(function() {
   var socket = io();
 
   const attendeeBox = document.querySelector(".attendees");
@@ -26,18 +7,118 @@ if (enableScript()) {
   const chatWindow = document.querySelector(".chat-container");
   const sendButton = document.querySelector(".send");
   const inputField = document.querySelector(".input");
+  const addButtons = document.querySelectorAll(".add");
 
   let userName = document.querySelector(".username").dataset.user;
   let roomId = document.querySelector(".sharePin").dataset.room;
+  
 
   function scrollToEnd() {
     chatWindow.scrollTop = chatWindow.scrollHeight;
   }
+
+  scrollToEnd();
   
+
+  // function sortByVotes(){
+  //   document.querySelector('.readingList').sort(function (a, b) {
+  //     return +a.dataset.name - +b.dataset.name;
+  // })
+  // .appendTo( $wrapper );
+  // }
+
+
+  document.querySelector(".leave").addEventListener("click", e =>{
+    e.preventDefault();
+    socket.emit("leave", {user: userName, room: roomId})
+    location.href = "/"
+  })
+
+
+addButtons.forEach( button=>{
+  button.addEventListener("click", e=>{
+    e.preventDefault();
+    const bookData = {
+      title: e.target.dataset.title,
+      subtitle: e.target.dataset.subtitle,
+      cover: e.target.dataset.cover,
+      description: e.target.dataset.description,
+      price: e.target.dataset.price,
+      author: e.target.dataset.author,
+      bookid: e.target.dataset.bookid
+    }
+    addBook(bookData)
+  })
+})
+
+function addToListEvents(elementId){
+    document.querySelector(`#${elementId}`).addEventListener("click", e=>{
+      e.preventDefault();
+        const bookData = {
+            title: e.target.dataset.title,
+            subtitle: e.target.dataset.subtitle,
+            cover: e.target.dataset.cover,
+            description: e.target.dataset.description,
+            price: e.target.dataset.price,
+            author: e.target.dataset.author,
+            bookid: e.target.dataset.bookid
+          }
+        addBook(bookData)
+    })
+  }
+
+  // this is the search results
+  function addListener(){
+    document.querySelectorAll(".share").forEach(book=>{
+      book.addEventListener("click", e=>{
+        const bookData = {
+          title: book.dataset.title,
+          subtitle: book.dataset.subtitle,
+          cover: book.dataset.cover,
+          description: book.dataset.description,
+          price: book.dataset.price,
+          author: book.dataset.author,
+          bookid: e.target.dataset.bookid
+        }
+        sendMessage(bookData)
+      })
+    })
+  }
+  
+  function addBook(bookData){
+    socket.emit("add book", {room: roomId, from: userName, book: bookData});
+  }
+
+  socket.on("add to reading list", function(data){
+    console.log(data)
+});
+
   function buildAMessage(from, messageContent, timestamp) {
     let setToSide;
+    let aMessage;
+    // <p class="small">€${messageContent.price}</p>
+    // this is the book reccomended in the chat
     from == userName ? (setToSide = `<li class="message my-message"`) : (setToSide = `<span class="from">${from}:</span> <li class="message"`);
-    let aMessage = `${setToSide}"><p class="message-txt">${messageContent}</p><span class="time">${timestamp}</span></li>`;
+    if(messageContent.title){
+      aMessage = `${setToSide}">
+        <div class="message-book message-txt">
+            <button id="${messageContent.bookid}" data-bookid="${messageContent.bookid}" class="add" data-title="${messageContent.title ? messageContent.title : ""}" data-subtitle="${messageContent.subtitle ? messageContent.subtitle: ""}" data-cover="${messageContent.cover ? messageContent.cover : ""}" data-description="${messageContent.description ? messageContent.description : ""}" data-author="${messageContent.author ? messageContent.author : ""}" data-price="${messageContent.price ? messageContent.price : ""}" >add to reading list</button>
+
+            <div class="message-details">
+
+                <img class="message-img" src="${messageContent.cover}">
+                <p>${messageContent.title}</p>
+                <p>${messageContent.subtitle}</p>
+                <p class="small">${messageContent.author}</p>
+            </div>
+            <div class="message-description">
+                <p class="desc">${messageContent.description}</p>
+            </div>
+          </div>
+        </li>`
+    }else{
+      aMessage = `${setToSide}"><p class="message-txt">${messageContent}</p><span class="time">${timestamp}</span></li>`;
+    }
     return aMessage;
   }
 
@@ -48,7 +129,6 @@ if (enableScript()) {
   function clearInputfieldAndFocus() {
     document.querySelector(".input").value = "";
     document.querySelector(".input").focus();
-    //maybe change the placeholder depending on input? user feedback iets
   }
 
   function getCurrentTime() {
@@ -64,12 +144,6 @@ if (enableScript()) {
   //   chatWindow.insertAdjacentHTML("beforeend", sendMessagePrompt);
   // }
 
-
-  document.querySelector(".leave").addEventListener("click", e =>{
-    e.preventDefault();
-    socket.emit("leave", {user: userName, room: roomId})
-    location.href = "/"
-  })
 
   socket.on("user left", function(data){
     console.log(data)
@@ -102,27 +176,13 @@ if (enableScript()) {
     date.value= newDate
   })
 
-  
-
-
-
-
-  socket.on("open chat", function(data) {
-    chatWindow.innerHTML = "";
-    data.forEach(messageObject => {
-      const messageToRender = buildAMessage(
-        messageObject.from,
-        messageObject.msg,
-        messageObject.time
-      );
-      chatWindow.insertAdjacentHTML("beforeend", messageToRender);
-    });
-    scrollToEnd();
-  });
-
   socket.on("chat message", function(data) {
     const messageToRender = buildAMessage(data.from, data.msg, data.time);
     chatWindow.insertAdjacentHTML("beforeend", messageToRender);
+    addListener()
+    if(document.querySelector(`#${data.msg.bookid}`)){
+      addToListEvents(data.msg.bookid);
+    }
     scrollToEnd();
   });
 
@@ -138,8 +198,13 @@ if (enableScript()) {
     }
   });
 
-  function sendMessage() {
-    const message = inputField.value;
+  function sendMessage(msg) {
+    let message
+    if(!msg){
+        message = inputField.value;
+    }else{
+      message = msg
+    }
     if (message.length < 1) {
       clearInputfieldAndFocus();
       return;
@@ -158,5 +223,4 @@ if (enableScript()) {
   // const filteredCharacters = characters.filter((character) => character.toLowerCase().includes(e.target.value.toLowerCase()));
 
 
-})();
-}
+
