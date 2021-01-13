@@ -8,6 +8,8 @@
   const sendButton = document.querySelector(".send");
   const inputField = document.querySelector(".input");
   const addButtons = document.querySelectorAll(".add");
+  const likeButtons = document.querySelectorAll(".like-button");
+  const readingList = document.querySelector(".readingList");
 
   let userName = document.querySelector(".username").dataset.user;
   let roomId = document.querySelector(".sharePin").dataset.room;
@@ -27,6 +29,33 @@
   // .appendTo( $wrapper );
   // }
 
+  function returnDataset(event){
+    const bookData = {
+      title: event.dataset.title,
+      subtitle: event.dataset.subtitle,
+      cover: event.dataset.cover,
+      description: event.dataset.description,
+      price: event.dataset.price,
+      author: event.dataset.author,
+      bookid: event.dataset.bookid
+    }
+    return(bookData)
+  }
+
+  likeButtons.forEach(button =>{
+    button.addEventListener("click", e=>{
+      e.preventDefault();
+      socket.emit("like", {user: userName, room: roomId, bookid: e.target.dataset.bookid })
+    })
+  })
+
+  socket.on("new like", function(data){
+    const like = document.querySelector(`#like-${data.bookid}`)
+    if(data.user == userName){
+      like.classList.toggle("liked");
+    }
+    like.querySelector("span").innerHTML = data.NumberOflikes + " likes"
+});
 
   document.querySelector(".leave").addEventListener("click", e =>{
     e.preventDefault();
@@ -90,8 +119,31 @@ function addToListEvents(elementId){
   }
 
   socket.on("add to reading list", function(data){
-    console.log(data)
-});
+    addABook(data)
+  });
+  
+  function addABook(data){
+    let book = `
+      <li class="reccomended-book">
+        <p class="tiny bold recco">${data.from} reccomend:</p>
+        <div class="book-img-container">
+            <img src="${data.book.cover}" alt="${data.book.title} ${data.book.subtitle}">
+            <button class="like-button" 
+            id="like-${data.book.bookid}" 
+              data-bookid="${data.book.bookid}" class="add" 
+              data-title="${data.book.title ? data.book.title : ""}"
+              data-cover="${data.book.cover ? data.book.cover : ""}"
+              data-author="${data.book.author ? data.book.author : ""}">
+                  <span>${data.book.votes.length} likes</span>
+            </button>
+        </div>
+        <p>${data.book.title}</p>
+        <p class="bold small">by ${data.book.author}</p>
+    </li>`;
+
+    readingList.insertAdjacentHTML("beforeend", book);
+    // add a listener to the like button
+  }
 
   function buildAMessage(from, messageContent, timestamp) {
     let setToSide;
@@ -107,7 +159,7 @@ function addToListEvents(elementId){
             <div class="message-details">
 
                 <img class="message-img" src="${messageContent.cover}">
-                <p>${messageContent.title}</p>
+                <p class="bold">${messageContent.title}</p>
                 <p>${messageContent.subtitle}</p>
                 <p class="small">${messageContent.author}</p>
             </div>

@@ -371,10 +371,31 @@ main{
 .like-button{
     background: none;
     border: none;
-    outline-color: red;
+    outline: none;
     width: 128px;
     text-align: left;
-    margin: 0 0 0 30px;
+    margin: 6px 0 0 0;
+    padding: 0 0 0 25px;
+    position: relative;
+}
+
+.like-button span{
+    pointer-events: none;
+}
+.like-button::before{
+    content: "🖤";
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    display: block;
+    left: 0;
+    top: -3px;
+    opacity: .4;
+}
+
+.liked::before{
+    content: "❤️";
+    opacity: 1;
 }
 
 .heart{
@@ -401,4 +422,5 @@ main{
 
 .reccomended-book{
     list-style-type: none;
+    margin: 20px 0;
 }

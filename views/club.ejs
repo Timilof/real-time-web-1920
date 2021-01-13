@@ -52,7 +52,7 @@
                             <div class="message-details">
 
                                 <img class="message-img" src="<%=message.msg.cover%>">
-                                <p><%=message.msg.title%></p>
+                                <p class="bold"><%=message.msg.title%></p>
                                 <p><%=message.msg.subtitle%></p>
                                 <p class="small"><%=message.msg.author%></p>
                             </div>
@@ -81,15 +81,29 @@
                     <li class="reccomended-book">
                         <p class="tiny bold recco"><%=book.reccomendedBy%> reccomend:</p>
                         <div class="book-img-container">
-                            <img src="<%=book.pic%>" alt="<%=book.title%> <%=book.subtitle%>">
-                            
-                            <button class="like-button">
-                                <!-- <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="heart" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-heart fa-w-16 fa-7x"><path fill="currentColor" d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z" class="heart"></path></svg> -->
-                                <span><%=book.votes.length%> likes</span>
+                            <img src="<%=book.cover%>" alt="<%=book.title%> <%=book.subtitle%>">
+                            <% if (book.votes.length > 0) { book.votes.forEach(function(vote) { %>
+                                <button class="like-button <%= vote === username ? 'liked' : '' %>"
+                                id="like-<%=book.bookid%>" 
+                                data-bookid="<%=book.bookid%>" class="add" 
+                                data-title="<%=book.title%>"
+                                data-cover="<%=book.cover%>"
+                                data-author="<%=book.author%>">
+                                    <span><%=book.votes.length%> likes</span>
                             </button>
+                            <% })} else { %>
+                                <button class="like-button"
+                                    id="like-<%=book.bookid%>" 
+                                    data-bookid="<%=book.bookid%>" class="add" 
+                                    data-title="<%=book.title%>"
+                                    data-cover="<%=book.cover%>"
+                                    data-author="<%=book.author%>">
+                                        <span><%=book.votes.length%> likes</span>
+                                </button>
+                            <% } %>
                         </div>
-                        <p><%=book.name%></p>
-                        <p class="small"><%=book.author%></p>
+                        <p><%=book.title%></p>
+                        <p class="bold small">by <%=book.author%></p>
                     </li>
                 <% })} %>
             </div>

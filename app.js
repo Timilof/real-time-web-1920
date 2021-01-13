@@ -228,19 +228,14 @@ io.on("connection", function(socket) {
   // add book to bookList
   socket.on("add book", async function(data) {
     const reccomended = {
-      name: data.book.title, id: data.book.bookid, pic: data.book.cover, author: data.book.author, votes:[], reccomendedBy:data.from
+      title: data.book.title, bookid: data.book.bookid, cover: data.book.cover, author: data.book.author, votes:[], reccomendedBy:data.from
     }
-    const booksArray = [];
     const club = await GetFromDB("clubs", data.room);
     let result = club[0].bookList.find(obj => {
       return obj.id === data.book.bookid
     })
     if(!result || result == undefined){
-      // booksArray.push("reccomended");
-      // const newbooksArray = club[0].bookList.concat(booksArray)
-      // console.log(typeof booksArray, booksArray, "coming from booksarray");
-      club[0].bookList.push({name: data.book.title, id: data.book.bookid, pic: data.book.cover, author: data.book.author, votes:[], reccomendedBy:data.from});
-      console.log(club[0].bookList," coming from booklist");
+      club[0].bookList.push({title: data.book.title, bookid: data.book.bookid, cover: data.book.cover, author: data.book.author, votes:[], reccomendedBy:data.from});
       io.to(data.room).emit("add to reading list", {
         from: data.from,
         book: reccomended
@@ -255,6 +250,32 @@ io.on("connection", function(socket) {
   socket.on("new date", function(data) {
     io.to(data.room).emit("new date", data.date);
     updateInCollection(data.room, data.date, "date");
+  });
+
+
+  // new like and remove like ---- it is a toggle function
+  socket.on("like", async function(data) {
+    const club = await GetFromDB("clubs", data.room);
+    const IsSameId = (element) => element.bookid == data.bookid;
+    let bookIndex = club[0].bookList.findIndex(IsSameId);
+    if(bookIndex > -1){
+      let userVote = club[0].bookList[bookIndex].votes.find(vote => {
+        return vote === data.user;
+      })
+          if(!userVote || userVote == undefined){
+              // push the new user into the votes of the booklist
+              club[0].bookList[bookIndex].votes.push(data.user)
+              updateInCollection(data.room, club[0].bookList, "bookList");
+              io.to(data.room).emit("new like", {user: data.user, bookid: data.bookid, NumberOflikes: club[0].bookList[bookIndex].votes.length});
+            }else{
+              // remove user from votes
+              club[0].bookList[bookIndex].votes.splice(userVote, 1);
+              io.to(data.room).emit("new like", {user: data.user, bookid: data.bookid, NumberOflikes: club[0].bookList[bookIndex].votes.length});
+              updateInCollection(data.room, club[0].bookList, "bookList");
+          }
+      }else{
+        console.log("book is no longer in the booklist. period. maybe send back error msg")
+    };
   });
   
 });
