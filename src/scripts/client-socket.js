@@ -20,37 +20,23 @@
   }
 
   scrollToEnd();
-  
-
-  // function sortByVotes(){
-    //   document.querySelector('.readingList').sort(function (a, b) {
-    //     return +a.dataset.name - +b.dataset.name;
-    // })
-    // .appendTo( $wrapper );
-  // }
-
 
   
-
-
-  let categoryItems = document.querySelectorAll(".reccomended-book button");
-  let categoryItemsArray = Array.from(categoryItems);
-  
-  let sorted = categoryItemsArray.sort(sorter);
   
   function sorter(a,b) {
-      if(a.dataset.likes < b.dataset.likes) return -1;
-      if(a.dataset.likes > b.dataset.likes) return 1;
-      return 0;
+    if(a.dataset.likes > b.dataset.likes) return -1;
+    if(a.dataset.likes < b.dataset.likes) return 1;
+    return 0;
   }
+  
+  function sortBooks(){
+    let likedBooks = document.querySelectorAll(".reccomended-book");
+    let likedBooksArray = Array.from(likedBooks);
 
-  console.log(sorted)
-  // todo: have this fire when a user likes a book... so inside the socket.on("newlike" ()=>{ sorting here })
-  // document.querySelector("button").onclick = () => sorted.forEach(e => document.querySelector("#demo").appendChild(e));
-
-
-
-
+    let sorted = likedBooksArray.sort(sorter);
+    sorted.forEach(e => readingList.appendChild(e));
+  }
+  sortBooks();
 
   function returnDataset(event){
     const bookData = {
@@ -77,7 +63,12 @@
     if(data.user == userName){
       like.classList.toggle("liked");
     }
+    like.parentNode.parentNode.dataset.likes = data.NumberOflikes
     like.querySelector("span").innerHTML = data.NumberOflikes + " likes"
+    setTimeout(() => {
+      sortBooks();
+    }, 200);
+
 });
 
   document.querySelector(".leave").addEventListener("click", e =>{
@@ -147,7 +138,8 @@ function addToListEvents(elementId){
   
   function addABook(data){
     let book = `
-      <li class="reccomended-book">
+      <li class="reccomended-book"
+          data-likes="${data.book.votes ? data.book.votes.length : ""}">
         <p class="tiny bold recco">${data.from} reccomend:</p>
         <div class="book-img-container">
             <img class="reading-img" src="${data.book.cover}" alt="${data.book.title} ${data.book.subtitle}">

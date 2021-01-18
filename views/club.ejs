@@ -78,7 +78,9 @@
             <p>reading list</p>
             <div class="readingList">
                 <% if (bookList) { bookList.forEach(function(book) { %>
-                    <li class="reccomended-book">
+                    <li class="reccomended-book"
+                        data-title="<%=book.title%>"
+                        data-likes="<%=book.votes.length%>">
                         <p class="tiny bold recco"><%=book.reccomendedBy%> reccomend:</p>
                         <div class="book-img-container">
                             <img class="reading-img" src="<%=book.cover%>" alt="<%=book.title%> <%=book.subtitle%>">
