@@ -23,11 +23,34 @@
   
 
   // function sortByVotes(){
-  //   document.querySelector('.readingList').sort(function (a, b) {
-  //     return +a.dataset.name - +b.dataset.name;
-  // })
-  // .appendTo( $wrapper );
+    //   document.querySelector('.readingList').sort(function (a, b) {
+    //     return +a.dataset.name - +b.dataset.name;
+    // })
+    // .appendTo( $wrapper );
   // }
+
+
+  
+
+
+  let categoryItems = document.querySelectorAll(".reccomended-book button");
+  let categoryItemsArray = Array.from(categoryItems);
+  
+  let sorted = categoryItemsArray.sort(sorter);
+  
+  function sorter(a,b) {
+      if(a.dataset.likes < b.dataset.likes) return -1;
+      if(a.dataset.likes > b.dataset.likes) return 1;
+      return 0;
+  }
+
+  console.log(sorted)
+  // todo: have this fire when a user likes a book... so inside the socket.on("newlike" ()=>{ sorting here })
+  // document.querySelector("button").onclick = () => sorted.forEach(e => document.querySelector("#demo").appendChild(e));
+
+
+
+
 
   function returnDataset(event){
     const bookData = {
@@ -127,13 +150,14 @@ function addToListEvents(elementId){
       <li class="reccomended-book">
         <p class="tiny bold recco">${data.from} reccomend:</p>
         <div class="book-img-container">
-            <img src="${data.book.cover}" alt="${data.book.title} ${data.book.subtitle}">
-            <button class="like-button" 
+            <img class="reading-img" src="${data.book.cover}" alt="${data.book.title} ${data.book.subtitle}">
+            <button class="like-button ${data.book.votes.forEach(function(vote){ vote === username ? 'liked' : '' })}" 
             id="like-${data.book.bookid}" 
               data-bookid="${data.book.bookid}" class="add" 
               data-title="${data.book.title ? data.book.title : ""}"
               data-cover="${data.book.cover ? data.book.cover : ""}"
-              data-author="${data.book.author ? data.book.author : ""}">
+              data-author="${data.book.author ? data.book.author : ""}"
+              data-likes="${data.book.votes ? data.book.votes.length : ""}">
                   <span>${data.book.votes.length} likes</span>
             </button>
         </div>
@@ -143,6 +167,11 @@ function addToListEvents(elementId){
 
     readingList.insertAdjacentHTML("beforeend", book);
     // add a listener to the like button
+
+    document.querySelector(`#like-${data.book.bookid}`).addEventListener("click", e=>{
+      e.preventDefault();
+      socket.emit("like", {user: userName, room: roomId, bookid: e.target.dataset.bookid })
+    })
   }
 
   function buildAMessage(from, messageContent, timestamp) {
