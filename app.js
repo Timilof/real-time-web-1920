@@ -269,8 +269,11 @@ io.on("connection", function(socket) {
               io.to(data.room).emit("new like", {user: data.user, bookid: data.bookid, NumberOflikes: club[0].bookList[bookIndex].votes.length});
             }else{
               // remove user from votes
-              club[0].bookList[bookIndex].votes.splice(userVote, 1);
-              io.to(data.room).emit("new like", {user: data.user, bookid: data.bookid, NumberOflikes: club[0].bookList[bookIndex].votes.length});
+              let filtered = club[0].bookList[bookIndex].votes.filter(function(value, index, arr){ 
+                return value !== userVote;
+              })
+              club[0].bookList[bookIndex].votes = filtered;
+              io.to(data.room).emit("new like", {user: data.user, bookid: data.bookid, NumberOflikes: filtered.length});
               updateInCollection(data.room, club[0].bookList, "bookList");
           }
       }else{

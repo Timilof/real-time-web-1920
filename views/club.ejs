@@ -8,34 +8,80 @@
     <title>Bookclub lists</title>
 </head>
 <body>
-    <div>
-        <% if (clubName.length > 0) { %>
-            <% if (username.length > 0) { %>
-                <span class="username" data-user="<%=username%>">welcome <%=username%>, you can send messages and reccomend books to your club</span>
-            <% } %>
-            <% if (pin.length > 0) { %>
-                <p class="info">Others can join your club with the pin
-                    <span class="sharePin" data-room="<%=pin%>"><%=pin%></span>
-                </p>
-            <% } %>
-            <h1><%=clubName%></h1>
-        <% } %>
-        <p>Attending: </p>
-        <ul class="attendees">
-            <% if (users) { users.forEach(function(user) { %>
-                    <li class="attendee" id="u<%=user%>"><%=user%></li>
-            <% })} %>
-        </ul>
-    </div>
-    <a class="leave" href="/">leave club</a>
-    <div>
-        <p>Our next meeting will be on </p>
-        <input class="date" type="text" value="<%=date%>">
-        <button class="attend">attend meeting</button>
-    </div>
+    
+
+    
+
+    <!-- <a class="leave" href="/">leave club</a> -->
     <main>
-        <div>
-            <p>chat and votes</p>
+
+        <div class="attend-wrapper">
+            <div class="datewrap">
+                <div class="dateof">
+                    <label for="dateof" class="small">Date of meeting: </label>
+                    <input id="dateof" name="dateof" class="date" type="text" value="<%=date%>">
+                </div>
+                <button class="attend">RSVP meeting</button>
+            </div>
+            <ul class="attendees">
+                <% if (users) { users.forEach(function(user) { %>
+                        <li class="attendee" id="u<%=user%>"><%=user%></li>
+                <% })} %>
+            </ul>
+        </div>
+
+        <div class="welcome-holder">
+            <% if (clubName.length > 0) { %>
+                <h1><%=clubName%></h1>
+                <% if (username.length > 0) { %>
+                    <span class="username" data-user="<%=username%>">welcome <%=username%>, you can send messages and reccomend and vote books to your club</span>
+                <% } %>
+                <% if (pin.length > 0) { %>
+                    <p class="info">Others can join your club with the pin
+                        <span class="sharePin" data-room="<%=pin%>"><%=pin%></span>
+                    </p>
+                <% } %>
+            <% } %>
+    
+            <div class="search-container">
+                <input class="searchField" type="text" placeholder="find a book" />
+                <button class="searchButton">search</button>
+            </div>
+        </div>
+
+        <div class="readingWrapper">
+            <p>reading list</p>
+            <div class="readingList">
+                <% if (bookList) { bookList.forEach(function(book) { %>
+                    <li class="reccomended-book"
+                        data-title="<%=book.title%>"
+                        data-likes="<%=book.votes.length%>">
+                        <p class="tiny bold recco"><%=book.reccomendedBy%> reccomend:</p>
+                        <div class="book-list-wrapper">
+                            <div class="book-img-container">
+                                <img class="reading-img" src="<%=book.cover%>" alt="<%=book.title%> <%=book.subtitle%>">
+                            
+                                <button class="like-button <%= book.votes.includes(username) ? 'liked' : 'no' %>"
+                                id="like-<%=book.bookid%>" 
+                                data-bookid="<%=book.bookid%>" class="add" 
+                                data-title="<%=book.title%>"
+                                data-cover="<%=book.cover%>"
+                                data-likes="<%=book.votes.length%>"
+                                data-author="<%=book.author%>">
+                                <span><%=book.votes.length%> likes</span>
+                            </button>
+                            </div>
+                            <div>
+                                <p><%=book.title%></p>
+                                <p class="bold small">by <%=book.author%></p>
+                            </div>
+                        </div>
+                    </li>
+                <% })} %>
+            </div>
+        </div>
+
+        <div class="chat-wrapper">
             <div class="chat-container">
                 <% if (chat) { chat.forEach(function(message) { %>
                     <% if(message.from == username){ %>
@@ -74,41 +120,11 @@
             </div>
         </div>
                 
-        <div class="readingWrapper">
-            <p>reading list</p>
-            <div class="readingList">
-                <% if (bookList) { bookList.forEach(function(book) { %>
-                    <li class="reccomended-book"
-                        data-title="<%=book.title%>"
-                        data-likes="<%=book.votes.length%>">
-                        <p class="tiny bold recco"><%=book.reccomendedBy%> reccomend:</p>
-                        <div class="book-img-container">
-                            <img class="reading-img" src="<%=book.cover%>" alt="<%=book.title%> <%=book.subtitle%>">
-                        
-                            <button class="like-button <%= book.votes.includes(username) ? 'liked' : 'no' %>"
-                            id="like-<%=book.bookid%>" 
-                            data-bookid="<%=book.bookid%>" class="add" 
-                            data-title="<%=book.title%>"
-                            data-cover="<%=book.cover%>"
-                            data-likes="<%=book.votes.length%>"
-                            data-author="<%=book.author%>">
-                            <span><%=book.votes.length%> likes</span>
-                        </button>
-                        </div>
-                        <p><%=book.title%></p>
-                        <p class="bold small">by <%=book.author%></p>
-                    </li>
-                <% })} %>
-            </div>
-        </div>
+        
     </main>
-    <div class="search-container">
-        <input class="searchField" type="text" placeholder="find a book" />
-        <button class="searchButton">search</button>
-    </div>
-    <div class="searchContainer">
+    
+    <div class="searchContainer"></div>
 
-    </div>
     <script src="/scripts/api.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/scripts/client-socket.js"></script>

@@ -63,7 +63,7 @@
     if(data.user == userName){
       like.classList.toggle("liked");
     }
-    like.parentNode.parentNode.dataset.likes = data.NumberOflikes
+    like.parentNode.parentNode.parentNode.dataset.likes = data.NumberOflikes
     like.querySelector("span").innerHTML = data.NumberOflikes + " likes"
     setTimeout(() => {
       sortBooks();
@@ -71,11 +71,11 @@
 
 });
 
-  document.querySelector(".leave").addEventListener("click", e =>{
-    e.preventDefault();
-    socket.emit("leave", {user: userName, room: roomId})
-    location.href = "/"
-  })
+  // document.querySelector(".leave").addEventListener("click", e =>{
+  //   e.preventDefault();
+  //   socket.emit("leave", {user: userName, room: roomId})
+  //   location.href = "/"
+  // })
 
 
 addButtons.forEach( button=>{
@@ -141,20 +141,24 @@ function addToListEvents(elementId){
       <li class="reccomended-book"
           data-likes="${data.book.votes ? data.book.votes.length : ""}">
         <p class="tiny bold recco">${data.from} reccomend:</p>
-        <div class="book-img-container">
-            <img class="reading-img" src="${data.book.cover}" alt="${data.book.title} ${data.book.subtitle}">
-            <button class="like-button ${data.book.votes.forEach(function(vote){ vote === username ? 'liked' : '' })}" 
-            id="like-${data.book.bookid}" 
-              data-bookid="${data.book.bookid}" class="add" 
-              data-title="${data.book.title ? data.book.title : ""}"
-              data-cover="${data.book.cover ? data.book.cover : ""}"
-              data-author="${data.book.author ? data.book.author : ""}"
-              data-likes="${data.book.votes ? data.book.votes.length : ""}">
-                  <span>${data.book.votes.length} likes</span>
-            </button>
+        <div class="book-list-wrapper">
+            <div class="book-img-container">
+                <img class="reading-img" src="${data.book.cover}" alt="${data.book.title} ${data.book.subtitle}">
+                <button class="like-button ${data.book.votes.forEach(function(vote){ vote === username ? 'liked' : '' })}" 
+                id="like-${data.book.bookid}" 
+                  data-bookid="${data.book.bookid}" class="add" 
+                  data-title="${data.book.title ? data.book.title : ""}"
+                  data-cover="${data.book.cover ? data.book.cover : ""}"
+                  data-author="${data.book.author ? data.book.author : ""}"
+                  data-likes="${data.book.votes ? data.book.votes.length : ""}">
+                      <span>${data.book.votes.length} likes</span>
+                </button>
+            </div>
+            <div>
+                <p>${data.book.title}</p>
+                <p class="bold small">by ${data.book.author}</p>
+            </div>
         </div>
-        <p>${data.book.title}</p>
-        <p class="bold small">by ${data.book.author}</p>
     </li>`;
 
     readingList.insertAdjacentHTML("beforeend", book);
@@ -169,7 +173,6 @@ function addToListEvents(elementId){
   function buildAMessage(from, messageContent, timestamp) {
     let setToSide;
     let aMessage;
-    // <p class="small">€${messageContent.price}</p>
     // this is the book reccomended in the chat
     from == userName ? (setToSide = `<li class="message my-message"`) : (setToSide = `<span class="from">${from}:</span> <li class="message"`);
     if(messageContent.title){

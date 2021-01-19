@@ -1,0 +1,91 @@
+body > *,
+p,
+h3{
+    margin: 0;
+    padding: 0;
+    font-family: 'avenir',Arial, Helvetica, sans-serif
+}
+
+h1{
+    font-size: 20px;
+    text-align: left;
+    margin: 0 0 40px;
+    align-self: start;
+    font-weight: 500;
+}
+
+body{
+    background-color: #eee;
+    margin: 0;
+    padding: 0;
+}
+
+label{
+    display: block;
+    color: #9c9c9c;
+}
+
+input{
+    margin: 0 0 30px;
+    background-color: #3d3c40;
+    border: none;
+    border-bottom: 2px solid #797979;
+    width: 100%;
+    font-size: 20px;
+    color: #fff;
+    outline: none;
+}
+
+.form-holder{
+    display: flex;
+    flex-direction: column;
+    max-width: 410px;
+    align-items: center;
+    justify-content: unset;
+    margin: 100px auto;
+    height: 500px;
+    background-color: #3d3c40;
+    color: #fff;
+    padding: 20px;
+    border-radius: 18px;
+
+}
+
+.cancel-button{
+    background-color: #6f6f6f;
+    color: #eee;
+    padding: 4px 18px;
+    margin: 0;
+    line-height: 20px;
+    text-decoration: none;
+    text-align: center;
+    border-radius: 6px;
+    border: none;
+    font-size: 14px;
+}
+
+.create{
+    font-size: 14px;
+    background-color: #FF6726;
+    color: #eee;
+    padding: 4px 18px;
+    margin: 0;
+    line-height: 20px;
+    text-decoration: none;
+    text-align: center;
+    border-radius: 6px;
+    border: none;
+}
+
+.newroomlink{
+    color: #fd6726;
+    text-decoration: none;
+    font-size: 20px;
+    margin: 40px;
+    border-bottom: 1px solid #fd6726;
+}
+
+.welcom{
+    text-align: center;
+    margin: 10px;
+}

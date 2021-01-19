@@ -5,21 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>create club</title>
+    <link rel="stylesheet" href="/styles/create.css">
 </head>
 <body>
-    <h1>Create a space for your online club</h1>
-    <form action="/create-new" method="post">
-        
-        <label for="username">Your name / username</label>
-        <input id="username" name="username" type="text" required>
+    <div class="form-holder">
+        <h1>Create a space for your online club</h1>
+        <form action="/create-new" method="post">
+            
+            <label for="username">Your name / username</label>
+            <input id="username" name="username" type="text" required>
 
-        <label for="clubName">Your clubs name / something descriptive maybe?</label>
-        <input id="clubName" name="clubName" type="text" required>
+            <label for="clubName">Your clubs name / something descriptive maybe?</label>
+            <input id="clubName" name="clubName" type="text" required>
 
-        <label for="date">Date of your next club meeting</label>
-        <input id="date" name="date" type="text">
+            <label for="date">Date of your next club meeting</label>
+            <input id="date" name="date" type="text" placeholder="You can always change this later">
 
-        <button type="submit">submit</button>
-    </form>
+            <a class="cancel-button" href="/">Cancel</a>
+            <button class="create" type="submit">Create</button>
+        </form>
+    </div>
 </body>
 </html>

@@ -4,24 +4,30 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <link rel="stylesheet" href="/styles/chat.css" />
+    <link rel="stylesheet" href="/styles/create.css" />
     <title>Bookclub lists</title>
 </head>
 <body>
-    <h1>book club</h1>
-
+    <div class="welcom">
+        <p>welcome to your online book club, you can send messages, RSVP and reccomend and vote books to your club</p>
+        <p>Everything needed to help you swiftly plan your next meeting</p>
+    </div>
+        
     <main>
+    <div class="form-holder">
+            <h1>Join your book club's online space!</h1>
             <% if (errorMsg.length > 0) { %>
                 <span><%=errorMsg%></span>
             <% } %>
-        <form class="joinForm" action="/" method="post">
-            <input id="username" class="username" type="text" value="" name="username" placeholder="username" autocomplete="off" required="required" />
-            <label for="roomName">Enter your clubs pin to join</label>
-            <input id="roomName" class="roomName" type="text" value="" name="roomName" placeholder="- - - - -" autocomplete="off" required="required" />
-            <button type="submit">join</button>
-        </form>
+            <form class="joinForm" action="/" method="post">
+                <input id="username" class="username" type="text" value="" name="username" placeholder="username" autocomplete="off" required="required" />
+                <label for="roomName">Enter your clubs pin to join</label>
+                <input id="roomName" class="roomName" type="text" value="" name="roomName" placeholder="- - - - -" autocomplete="off" required="required" />
+                <button class="create" type="submit">join</button>
+            </form>
 
-        <a href="/new-room">or create a room</a>
+            <a class="newroomlink" href="/new-room">or create a room</a>
+        </div>
     </main>
 
 </body>
