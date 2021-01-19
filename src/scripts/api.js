@@ -33,6 +33,17 @@ function buildBooks(data){
   searchContainer.insertAdjacentHTML('beforeend', book)
 }
 
+document.querySelector(".collapse").addEventListener("click", e=>{
+  e.preventDefault();
+  searchContainer.classList.toggle("hidden")
+})
+
+function toggleResults(){
+  searchContainer.classList.remove("hidden")
+}
+
+
+
   function dataFetch(typeUrl) {
     fetch(typeUrl)
       .then(function(data) {
@@ -42,7 +53,6 @@ function buildBooks(data){
         return ongeparsteData.json()
       })
       .then(function(geparsteData) {
-        console.log(geparsteData.items)
           // removeEvents()
           searchContainer.innerHTML = "";
           // dangerously placed innerHTML...
@@ -51,6 +61,7 @@ function buildBooks(data){
             buildBooks(book)
           })
           addListener()
+          toggleResults()
       })
   }
 

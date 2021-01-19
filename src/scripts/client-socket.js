@@ -124,6 +124,7 @@ function addToListEvents(elementId){
           bookid: e.target.dataset.bookid
         }
         sendMessage(bookData)
+        searchContainer.classList.add("hidden")
       })
     })
   }
@@ -162,8 +163,8 @@ function addToListEvents(elementId){
     </li>`;
 
     readingList.insertAdjacentHTML("beforeend", book);
+    
     // add a listener to the like button
-
     document.querySelector(`#like-${data.book.bookid}`).addEventListener("click", e=>{
       e.preventDefault();
       socket.emit("like", {user: userName, room: roomId, bookid: e.target.dataset.bookid })
@@ -273,6 +274,8 @@ function addToListEvents(elementId){
       sendMessage();
     }
   });
+
+  
 
   function sendMessage(msg) {
     let message

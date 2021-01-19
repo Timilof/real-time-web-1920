@@ -195,10 +195,17 @@ h2{
     padding: 14px 10px;
     border-radius: 8px;
     border: none;
-    /* background-color: #46B38E;     */
-    background-color: #000;    
+    background-color: #fd6726;    
     color: #fffbf6;
     letter-spacing: 1px;
+}
+
+.collapse{
+    background-color: #000;
+    color: #eee;
+    padding: 10px;
+    border: none;
+    border-radius: 7px;
 }
 
 .searchButton{
@@ -221,6 +228,16 @@ main{
     background-color: #3d3c40;
     border-radius: 8px;
     margin: 40px 100px 0 0;
+    position: relative;
+}
+
+.share{
+    background-color: #fd6726;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    color: #eee;
+    font-size: 15px;
 }
 
 .welcome-holder{
@@ -263,11 +280,16 @@ main{
 }
 
 .searchContainer{
-    margin: 0 150px 50px;
-    max-height: 400px;
+    max-height: 570px;
     overflow-x: hidden;
     overflow-y: scroll;
     padding: 20px 0 0 0;
+    position: absolute;
+    top: 59px;
+    background: #1d1d1f;
+    width: 100%;
+    z-index: 2;
+    margin: auto;
 }
 
 .attend-wrapper{
@@ -298,8 +320,7 @@ main{
 }
 
 .book-cover{
-    box-shadow: 0px 4px 7px 12px rgba( 255,255,255,0.4 ), 0px 4px 16px rgb(0 0 0 / 66%);
-
+    box-shadow: 0px 4px 7px 12px rgb(253 103 38 / 0%), 0px 4px 16px rgb(253 103 38 / 55%);
 }
 
 .small{
