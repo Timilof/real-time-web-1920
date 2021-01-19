@@ -5,8 +5,7 @@
 welcome to your online book club, you can send messages, RSVP and reccomend and vote books to your club
 Everything needed to help you swiftly plan your next meeting
 
-https://i.imgur.com/SgB8SMU.png
-![app do]: https://i.imgur.com/SgB8SMU.png "application go brr"
+![book app](https://i.imgur.com/SgB8SMU.png "application go brr")  
 
 live link to the application on heroku!
 [here](https://bookclub-rtw.herokuapp.com/)
