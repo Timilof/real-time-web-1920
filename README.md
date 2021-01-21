@@ -80,9 +80,19 @@ What's very important that I forgot to mention was that the server generates a u
 
 The database is the nice part, here all the users data is stored so that if a user leaves a room that the data is still there if they re-enter. (Also we perform some checks with the data to make sure we have one true source but that would be done either way if you were to save the data on the server).
 
-here's what a clubroom's document could look like:  
+here's what a clubroom's data object could look like:  
 ![clubroom data object](https://i.imgur.com/d54xdTw.png "data object goes brr brr")  
 
+<details>
+  <summary>Click to show explanation of the club's data object</summary>
+  
+Userlist = the users that rsvp'd
+booklist = all the books in the reading list (also contains likes that a book has)
+clubpin = the unique code for joining
+clubname = the name specified at the start and can NEVER EVER be changed (without accessing the database manually)
+date = the current meeting date (this one CAN be changed at all times by regular users in the room)
+host = creator of the room (I wanted to add host-only functionalities but I ran out of time... would have been nice though!)  
+</details>
 
 The application writes to, updates, and fetches data from the Mongo DB database and does so with a few calls which are structured in a similar manner.  
 Such a call could look like this
