@@ -3,7 +3,7 @@
 ## Online booklub
 
 welcome to your online book club, you can send messages, RSVP and reccomend and vote books to your club
-Everything needed to help you swiftly plan your next meeting
+Everything needed to help you swiftly plan your club's next meeting
 
 ![book app](https://i.imgur.com/xj4NJOE.png "application go brr")  
 
