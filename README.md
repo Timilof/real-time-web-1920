@@ -86,12 +86,15 @@ here's what a clubroom's data object could look like:
 <details>
   <summary>Click to show explanation of the club's data object</summary>
   
+```
+
 Userlist = the users that rsvp'd
 booklist = all the books in the reading list (also contains likes that a book has)
 clubpin = the unique code for joining
 clubname = the name specified at the start and can NEVER EVER be changed (without accessing the database manually)
 date = the current meeting date (this one CAN be changed at all times by regular users in the room)
 host = creator of the room (I wanted to add host-only functionalities but I ran out of time... would have been nice though!)  
+```
 </details>
 
 The application writes to, updates, and fetches data from the Mongo DB database and does so with a few calls which are structured in a similar manner.  
