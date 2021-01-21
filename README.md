@@ -47,7 +47,8 @@ thats all you'll need so let's get it
 ## Concept
 It's for helping bookclubs pick a book and a date for their next meeting!  
 
-The rooms in my application are created by users and are for plannning a meeting for a bookclub. I got this idea from a friend I was visiting who would do this over the phone and via a Whatsapp chatgroup wherein their bookclub would spend a couple days picking a book (or books) and picking a date, I thought it could be very cool if I could make a simple tool to help out with that and this is my result. A user can create a room specifying the name of the club/meeting and the first initial date (date can always be changed in later). The application then creates a room for them where they can quickly search books and share them in the group, add them to a reading list and vote for books you like to show them at the top of the list. This way everyone see clearly what the plan is and the room is kept online even after all users leave, so they can revisit the room if they would choose to.
+The rooms in my application are created by users and are for plannning a meeting for a bookclub. I got this idea from a friend I was visiting who would do this over the phone and via a Whatsapp chatgroup wherein their bookclub would spend a couple days picking a book (or books) and picking a date, I thought it could be very cool if I could make a simple tool to help out with that and this is my result. A user can create a room specifying the name of the club/meeting and the first initial date (date can always be changed in later). The app generates a unique 5-symbol pin which is like your club pin and users can use that pin to join your clubroom!  
+The application then creates a room for them where they can quickly search books and share them in the group, add them to a reading list and vote for books you like to show them at the top of the list. This way everyone see clearly what the plan is and the room is kept online even after all users leave, so they can revisit the room if they would choose to.
 
 
 ## APi
@@ -75,10 +76,15 @@ You can see the data returned in the data life-cycle part two sections below, if
 
 ## Database
 
-The database is the nice part, here all the users data is stored so that if a user leaves a room that the data is still there if they re-enter. (Also we perform some checks with the data to make sure we have one true source but that's )
+What's very important that I forgot to mention was that the server generates a unique 5-symbol pin which is like your identifier pretty much and thats how users can join their respective clubrooms and we also use that pin to do all the database stuff (writing, updating and fetching).
+
 The database is the nice part, here all the users data is stored so that if a user leaves a room that the data is still there if they re-enter. (Also we perform some checks with the data to make sure we have one true source but that would be done either way if you were to save the data on the server).
 
-The application writes to, updates and looks up data from the Mongo DB database and does so with a few calls which are structured in a similar manner.  
+here's what a clubroom's document could look like:  
+![clubroom data object](https://i.imgur.com/d54xdTw.png "data object goes brr brr")  
+
+
+The application writes to, updates, and fetches data from the Mongo DB database and does so with a few calls which are structured in a similar manner.  
 Such a call could look like this
 
 ```javascript
@@ -104,7 +110,7 @@ async function updateInCollection(pin, newValue, explicit) {
 If you were to look in the code you'd see a lot of repetition which I know is bad... sorry.  
 
 ## Data life cycle
-Here's a small visualisation of the data life cycle, showing which data is available where and where the data changes/is manipulated.
+Here's a small visualisation of the data life cycle, showing where data is available and where the data changes/is manipulated.
 ![book app](https://i.imgur.com/LUkvP18.png "application go brr")  
 
 Data being manipulated:  
