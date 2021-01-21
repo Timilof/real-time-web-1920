@@ -53,7 +53,6 @@ function toggleResults(){
         return ongeparsteData.json()
       })
       .then(function(geparsteData) {
-          // removeEvents()
           searchContainer.innerHTML = "";
           // dangerously placed innerHTML...
           
